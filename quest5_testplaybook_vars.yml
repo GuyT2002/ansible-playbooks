@@ -1,0 +1,30 @@
+---
+  - hosts: all
+    become: true
+    vars_files:
+      - /home/automation/plays/secret.yml
+
+    tasks:
+
+    - name: print variables
+      debug:
+        msg: "item={{ item }}"
+      with_items: "{{ passwords }}"
+
+    - name: print dictionary values
+      debug:
+        msg: "Key={{ item.key }} value={{ item.value }}"
+      with_dict: "{{ passwords }}"
+
+    - name: Creates directory
+      file:
+        path: "/home/automation/{{ item.key }}"
+        state: directory
+      loop: "{{ password | dict2items  }}"
+
+
+    - name: Creating a file with content
+      copy:
+        dest: "/home/automation/item={{ item }}"
+        content: "item={{ item }}"
+      loop: "{{ passwords }}"
