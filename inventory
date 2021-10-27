@@ -6,7 +6,7 @@ ansible3 ansible_host=192.168.122.228
 ansible4 ansible_host=192.168.122.140
 
 [database]
-ansible5 ansible_host=192.168.122.83
+ansible5 ansible_host=192.168.122.189
 
 [all:vars]
 ansible_user=automation
