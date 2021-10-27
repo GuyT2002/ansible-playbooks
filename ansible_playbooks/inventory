@@ -1,0 +1,15 @@
+[proxy]
+ansible2 ansible_host=192.168.122.241
+
+[webservers]
+ansible3 ansible_host=192.168.122.228
+ansible4 ansible_host=192.168.122.140
+
+[database]
+ansible5 ansible_host=192.168.122.189
+
+[all:vars]
+ansible_user=automation
+ansible_password=
+ansible_become_user=root
+ansible_become_password=havita22

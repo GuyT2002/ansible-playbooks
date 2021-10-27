@@ -1,0 +1,50 @@
+---
+# tasks file for sample-apache
+- name: Install web server
+  ansible.builtin.yum:
+    name: "httpd"
+    state: present
+
+- name: Install mod_ssl
+  ansible.builtin.yum:
+    name: "mod_ssl"
+    state: present
+
+- name: Install php
+  ansible.builtin.yum:
+    name: "php"
+    state: present
+
+- name: Start service httpd, if not started, and enable it
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: enable the port 80 for http
+  ansible.builtin.firewalld:
+    port: 80/tcp
+    permanent: yes
+    state: enabled
+
+- name: enable the port 443 for https
+  ansible.builtin.firewalld:
+    port: 443/tcp
+    permanent: yes
+    state: enabled
+
+- name: create the index.html file with content
+  copy:
+    content: "The address of the server is: 192.168.122.{124,228}"
+    dest: /var/www/html/index.html
+  register: index
+
+- name: print out value of the variable
+  debug:
+    msg: "{{ index }}"
+
+- name: restart httpd of file was modified
+  service:
+    name: httpd
+    state: reload
+  when: index.changed

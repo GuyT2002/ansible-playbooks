@@ -1,0 +1,19 @@
+---
+# - hosts: webservers
+#   become: yes
+#    selinux_booleans:
+#      - { name: 'httpd_can_network_connect', state: 'on' }
+#   roles:
+#      - {"role": rhel-system-roles.selinux}
+#      selinux_booleans:
+#        - { name: 'httpd_can_network_connect', state: 'on' }
+#
+#
+  - hosts: webservers 
+    become: yes
+    tasks:
+      - name: Set httpd_can_network_connect flag on reboot resiliant
+        seboolean:
+          name: httpd_can_network_connect
+          state: yes
+          persistent: yes

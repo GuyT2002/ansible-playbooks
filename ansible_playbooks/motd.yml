@@ -1,0 +1,28 @@
+---
+  - hosts: proxy
+    become: true
+    tasks:
+      - name:
+        copy:
+          dest: "/etc/motd"
+          content: |
+            Welcome to the HA proxy server.
+
+  - hosts: webservers
+    become: true
+    tasks:
+      - name:
+        copy:
+          dest: "/etc/motd"
+          content: |
+            Welcome to the webservers.
+
+  - hosts: database
+    become: true
+    tasks:
+      - name:
+        copy:
+          dest: "/etc/motd"
+          content: |
+            Welcome to the MySQL server.
+

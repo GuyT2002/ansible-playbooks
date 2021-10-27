@@ -1,0 +1,61 @@
+---
+  - hosts: webservers
+    become: true
+    vars_files:
+      - /home/automation/plays/secret.yml
+      - /home/automation/plays/vars/user_list.yml
+
+    tasks:
+
+      - name: check the dict vaibility
+        debug:
+          msg: "username:{{ item.username }}, UID={{ item.uid }}"
+        loop: "{{ users }}"
+        when:  
+          - (item.uid | string)[0] | int == 1
+
+      - name: create users on webservers if their UID starts with 1
+        ansible.builtin.user:
+          name: "{{ item.username }}"
+          comment: "webserver member user"
+          uid: "{{ item.uid }}"
+          shell: /bin/bash
+          group: wheel
+          password: "{{ user_password | password_hash('sha512') }}"
+        loop: "{{ users }}"
+        when:
+          - (item.uid | string)[0] | int == 1
+
+  - hosts: database
+    become: true
+    vars_files:
+      - /home/automation/plays/secret.yml
+      - /home/automation/plays/vars/user_list.yml
+
+    tasks:
+
+      - name: create users on database if their UID starts with 2
+        ansible.builtin.user:
+          name: "{{ item.username }}"
+          comment: "databse member user"
+          uid: "{{ item.uid }}"
+          shell: /bin/bash
+          group: wheel
+          password: "{{ user_password | password_hash('sha512') }}"
+        loop: "{{ users }}"
+        when:
+          - (item.uid | string)[0] | int == 2
+
+  - hosts: database,webservers
+    become: true
+    vars_files:
+      - /home/automation/plays/vars/user_list.yml
+
+    tasks:
+
+      - name: set SSH keys to created users
+        ansible.builtin.authorized_key:
+          user: "{{ item.username }}"
+          state: present
+          key: "{{ lookup('file', '/home/automation/.ssh/id_rsa.pub') }}"
+        loop: "{{ users }}"

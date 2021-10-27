@@ -1,0 +1,57 @@
+- name: make sure lvm is installed on the machine 
+  yum:
+    name: 'lvm*'
+    state: present
+- name: print userpassword
+  debug:
+    msg: "{{ database_password }}"
+- name: craete 800MB part
+  parted:
+    device: /dev/vda
+    number: 2
+    state: present
+    flags: [ lvm ]
+    part_start: 43GB
+    part_end: 44GB
+- name: Create VG on the partition
+  lvg:
+    vg: vg_database
+    pvs: /dev/vda2
+  # pesize: 32
+- name: Create a logical volume of 512M
+  lvol:
+    vg: vg_database
+    lv: lv_mysql
+    size: 512m
+
+- name: get the mysql repo form the web
+  command: wget https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+- name: authentication against the mysql software
+  command: md5sum mysql80-community-release-el7-3.noarch.rpm
+- name: install the mysql server package
+  command: rpm -ivh mysql80-community-release-el7-3.noarch.rpm
+- name: install the mysql community package
+  command: yum install -y mysql-community-server --skip-broken
+- name: install the PyMySQL package
+  command: yum install -y MySQL-python --skip-broken
+- name: permit traffic in port 3306 TCP for mysql
+  ansible.builtin.firewalld:
+    port: 3306/tcp
+    permanent: yes
+    state: enabled
+- name: copy the MySQL confs file
+  copy:
+    dest: /etc/mysql/
+    src: my.cnf.j2
+- name: Set MySQL root Password
+  mysql_user:
+    login_host: 'localhost'
+    login_user: 'root'
+    login_password: ''
+    name: 'root'
+    password: '{{ database_password }}'
+    state: present
+- name: copy the MySQL confs file
+  copy:
+    dest: /etc/mysql/
+    src: my.cnf.j2

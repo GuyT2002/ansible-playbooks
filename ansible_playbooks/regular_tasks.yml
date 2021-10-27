@@ -1,0 +1,21 @@
+---
+  - hosts: proxy
+    become: yes
+    tasks:
+
+      - name: Check that the time.log file exists
+        stat:
+          path: /var/log/time.log
+        register: stat_result
+
+      - name: Create the file, if it doesnt exist already
+        file:
+          path: /var/log/time.log
+          state: touch
+        when: not stat_result.stat.exists
+
+      - name: create a root crontab entry
+        ansible.builtin.cron:
+          name: "log date"
+          minute: "0"
+          job: "date >> /var/log/time.log"
