@@ -1,0 +1,56 @@
+---
+  - hosts: last
+    become: yes
+    tasks:
+      - name: make sure lvm is installed on the machine 
+        yum:
+          name: 'lvm*'
+          state: present
+      - name: craete 10B part
+        parted:
+          device: "{{ item }}"
+          state: present
+          number: 1
+          flags: [ lvm ]
+        loop:
+          - /dev/sdb
+          - /dev/sdc
+          - /dev/sdd
+      - name: Create VG on the partition
+        lvg:
+          vg: vgans01
+          pvs: /dev/sdb1,/dev/sdc1,/dev/sdd1
+      - name: Create a logical volume of 15GB
+        lvol:
+          vg: vgans01
+          lv: "{{ item }}"
+          size: 14.5g
+          force: yes
+        loop:
+          - lvans01
+          - lvans02
+      - name: craete XFS on both partitions
+        filesystem:
+          fstype: xfs
+          dev: "{{ item }}"
+        loop:
+          - /dev/vgans01/lvans01
+          - /dev/vgans01/lvans02
+      - name: create the needed dirs
+        file:
+          path: " {{ item }}"
+          state: directory
+        loop:
+          - /dir01
+          - /dir02
+      - name: mount the dirs on the partitions
+        mount:
+          path: "{{ item.key }}"
+          src: "{{ item.value }}"
+          fstype: xfs
+          state: mounted
+        loop: "{{ mount_data | dict2items }}"
+        vars:
+          mount_data:
+            /dir01: /dev/vgans01/lvans01
+            /dir02: /dev/vgans01/lvans02
