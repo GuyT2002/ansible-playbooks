@@ -1,0 +1,10 @@
+---
+  - hosts: webservers
+    become: true
+    tasks:
+
+    - name: remove the existing file
+      command: rm -f /etc/systemd/system/default.target
+    
+    - name: and set the new default target
+      command: ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target

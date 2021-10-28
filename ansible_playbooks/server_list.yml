@@ -1,0 +1,25 @@
+---
+  - hosts: database
+    become: yes
+    tasks:
+
+    - name: copy the j2 template to the remote server
+      copy:
+        src: /home/automation/plays/git-ansible/ansible-playbooks/ansible_playbooks/vars/server_list.j2
+        dest: /etc/server_list.txt
+
+    - name: change hte owner of the file to automation
+      file:
+        path: /etc/server_list.txt
+        owner: automation
+        mode: '0600'
+
+    - name: make sure the neede python libraries are installed
+      yum:
+        name: policycoreutils-python
+        state: present
+
+    - name: set the correct selinux type
+      sefcontext:
+        target: '/etc/server_list.txt'
+        setype: net_conf_t
