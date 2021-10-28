@@ -1,0 +1,23 @@
+---
+  - hosts: database
+    vars:
+      remote_dir: /etc/ansible/facts.d
+      facts_file: custom.fact
+    tasks:
+    - name: Create Facts Dir on Managed Hosts
+      file:
+        path: "{{ remote_dir }}"
+        state: directory
+        recurse: yes
+    - name: Copy Contents to Facts file
+      copy:
+        dest: "{{ remote_dir }}/{{ facts_file }}"
+        content: |
+          [sample_exam]
+          server_role=mysql
+    - name: Collect only selected facts
+      setup:
+        filter: ansible_local.custom
+    - name: print facts
+      debug:
+        msg: "the custom fact is: {{ ansible_local.custom.sample_exam }}" 
