@@ -1,0 +1,11 @@
+---
+  - hosts: all
+    become: yes
+    tasks:
+      - name: change the swappiness if the 2048 or greater
+        command: "sysctl -w vm.swappiness=10" 
+        when:  (ansible_memtotal_mb >= '2048')
+      - name: print error else
+        debug:
+          msg: "Server memory less than 2048MB"
+        when:  (ansible_memtotal_mb < '2048')
