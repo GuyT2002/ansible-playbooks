@@ -1,0 +1,12 @@
+---
+  - hosts: all
+    become: true
+    vars_files:
+      - roles/users/vars/user_list.yml
+      - roles/users/vars/vaults/secret.yml
+
+    roles:
+      - {"role": users, "when": 'inventory_hostname in groups["webservers"]' , "password": "user_password"}
+
+      - {"role": users, "when": 'ansible_inventory_hostname in groups["database"]' , "password": "user_password"}
+

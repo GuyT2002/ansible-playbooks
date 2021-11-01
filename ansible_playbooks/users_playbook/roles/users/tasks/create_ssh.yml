@@ -1,0 +1,7 @@
+---
+- name: set SSH keys to created users
+  ansible.builtin.authorized_key:
+    user: "{{ item.username }}"
+    state: present
+    key: "{{ lookup('file', '/home/automation/.ssh/id_rsa.pub') }}"
+  loop: "{{ users.users }}"

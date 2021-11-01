@@ -1,0 +1,10 @@
+---
+# tasks file for users
+- name: create users with UID 1
+  include_tasks: roles/users/tasks/create_user_uid1.yml
+
+- name: create users with UID 2
+  include_tasks: roles/users/tasks/create_user_uid2.yml
+
+- name: craete ssh connection with all needed users
+  include_tasks: roles/users/tasks/create_ssh.yml

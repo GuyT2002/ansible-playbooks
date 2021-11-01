@@ -1,0 +1,17 @@
+---
+- name: read the user list into a variable
+  include_vars:
+    file: roles/users/vars/user_list.yml
+    name: users
+
+- name: craete users with UID 1
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    comment: "user UID starting with 1"
+    uid: "{{ item.uid }}"
+    shell: /bin/bash
+    group: wheel
+    password: "{{ password | password_hash('sha512')}}"
+  loop: "{{ users.users }}"
+  when:
+    - (item.uid | string)[0] | int == 1 

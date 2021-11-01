@@ -1,0 +1,12 @@
+---
+# tasks file for users
+- name: create users with UID 1 on webservers
+  import_tasks: create_user_uid1.yml
+  when: inventory_hostname in groups['webservers']
+
+- name: create users with UID 2 on webservers
+  import_tasks: create_user_uid2.yml
+  when: inventory_hostname in groups['database']
+
+- name: craete SSH connections for all users on all hosts
+  import_tasks: create_ssh.yml
