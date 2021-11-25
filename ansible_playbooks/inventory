@@ -15,4 +15,4 @@ ansible6 ansible_host=10.0.4.106
 ansible_user=automation
 ansible_password=
 ansible_become_user=root
-ansible_become_password=havita22
+ansible_become_password=########
